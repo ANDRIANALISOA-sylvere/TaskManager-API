@@ -9,6 +9,25 @@ export class TaskService {
     private projectService: ProjectService,
   ) {}
 
+  async getAllTasks() {
+    const tasks = await this.prisma.task.findMany({
+      include: { Project: true },
+    });
+
+    return tasks;
+  }
+
+  async getTaskById(id: number) {
+    const task = await this.prisma.task.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!task) {
+      throw new BadRequestException('task not found');
+    }
+
+    return task;
+  }
   async createTask(data: {
     title: string;
     description: string;
@@ -29,6 +48,16 @@ export class TaskService {
           },
         },
       },
+      include: {
+        Project: true,
+      },
+    });
+  }
+
+  async delete(id: number) {
+    const task = await this.getTaskById(id);
+    return this.prisma.task.delete({
+      where: { id: Number(task.id) },
       include: {
         Project: true,
       },

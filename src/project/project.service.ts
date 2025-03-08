@@ -19,12 +19,18 @@ export class ProjectService {
   }
 
   async getProjectById(id: number) {
-    return this.prisma.project.findUnique({
+    const project = await this.prisma.project.findUnique({
       where: { id: Number(id) },
       include: {
         User: true,
       },
     });
+
+    if (!project) {
+      throw new BadRequestException('project not found');
+    }
+
+    return project;
   }
   async createProject(data: { name: string; userId: number }) {
     const user = await this.userService.getUserById(data.userId);
@@ -49,11 +55,8 @@ export class ProjectService {
   }
   async deleteProject(id: number) {
     const project = await this.getProjectById(id);
-    if (!project) {
-      throw new BadRequestException('project not found');
-    }
     return this.prisma.project.delete({
-      where: { id: Number(id) },
+      where: { id: Number(project.id) },
       include: {
         User: true,
       },
