@@ -53,6 +53,20 @@ export class ProjectService {
 
     return project;
   }
+
+  async updateTask(id: number, data: { name: string }) {
+    const project = await this.getProjectById(id);
+
+    return this.prisma.project.update({
+      where: { id: project.id },
+      data: {
+        name: data.name,
+      },
+      include: {
+        User: true,
+      },
+    });
+  }
   async deleteProject(id: number) {
     const project = await this.getProjectById(id);
     return this.prisma.project.delete({

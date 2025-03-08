@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ProjectService } from './project.service';
 
 @Controller('projects')
@@ -15,6 +23,11 @@ export class ProjectController {
     const project = await this.projectService.createProject(body);
 
     return project;
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: number, @Body() data: { name: string }) {
+    return this.projectService.updateTask(id, data);
   }
 
   @Delete(':id')
