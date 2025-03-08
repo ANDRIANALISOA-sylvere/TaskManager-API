@@ -5,6 +5,8 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { UserService } from 'src/user/user.service';
 
 @Module({
   imports: [
@@ -13,7 +15,13 @@ import { LocalStrategy } from './strategies/local.strategy';
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  providers: [AuthService, PrismaService, LocalStrategy],
+  providers: [
+    AuthService,
+    PrismaService,
+    LocalStrategy,
+    JwtStrategy,
+    UserService,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

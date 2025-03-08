@@ -3,12 +3,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { IntegerType } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private jwtService: JwtService,
+    private userService: UserService,
   ) {}
 
   async register(data: { name: string; email: string; password: string }) {
@@ -32,9 +34,7 @@ export class AuthService {
   }
 
   async validateUser(data: { email: string; password: string }) {
-    const user = await this.prisma.user.findUnique({
-      where: { email: data.email },
-    });
+    const user = await this.userService.getUserByEmail(data.email);
 
     if (user && (await bcrypt.compare(data.password, user.password))) {
       return user;
