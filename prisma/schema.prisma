@@ -37,9 +37,22 @@ model Task {
   id          Int      @id @default(autoincrement())
   title       String
   description String?
-  status      String   @default("todo")
+  status      Status   @default(TODO)
+  priority    Priority @default(FAIBLE)
   Project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId   Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+enum Priority {
+  FAIBLE
+  MOYENNE
+  ELEVE
+}
+
+enum Status {
+  TODO
+  INPROGRESSE
+  COMPLETE
 }

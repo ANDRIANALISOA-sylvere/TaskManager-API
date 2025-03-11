@@ -20,7 +20,13 @@ export class TaskController {
   }
   @Post()
   async create(
-    @Body() data: { title: string; description: string; projectId: number },
+    @Body()
+    data: {
+      title: string;
+      description: string;
+      priority: string;
+      projectId: number;
+    },
   ) {
     const task = await this.taskService.createTask(data);
 
@@ -30,7 +36,7 @@ export class TaskController {
   @Put(':id')
   async update(
     @Param('id') id: number,
-    @Body() data: { title: string; description: string },
+    @Body() data: { title: string; description: string; priority: string },
   ) {
     const task = await this.taskService.updateTask(id, data);
     return task;

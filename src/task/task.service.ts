@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Priority } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProjectService } from 'src/project/project.service';
 
@@ -31,6 +32,7 @@ export class TaskService {
   async createTask(data: {
     title: string;
     description: string;
+    priority: string;
     projectId: number;
   }) {
     const project = await this.projectService.getProjectById(data.projectId);
@@ -38,10 +40,15 @@ export class TaskService {
       throw new BadRequestException('project not found');
     }
 
+    if (!Object.values(Priority).includes(data.priority as Priority)) {
+      throw new BadRequestException('invalide value of priority');
+    }
+
     return this.prisma.task.create({
       data: {
         title: data.title,
         description: data.description,
+        priority: data.priority as Priority,
         Project: {
           connect: {
             id: data.projectId,
@@ -54,13 +61,20 @@ export class TaskService {
     });
   }
 
-  async updateTask(id: number, data: { title: string; description: string }) {
+  async updateTask(
+    id: number,
+    data: { title: string; description: string; priority: string },
+  ) {
+    if (!Object.values(Priority).includes(data.priority as Priority)) {
+      throw new BadRequestException('invalid value of priority');
+    }
     const task = await this.getTaskById(id);
     return this.prisma.task.update({
       where: { id: task.id },
       data: {
         title: data.title,
         description: data.description,
+        priority: data.priority as Priority,
       },
       include: {
         Project: true,
