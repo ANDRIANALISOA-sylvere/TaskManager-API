@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { NotFoundError } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
+import { ProjectDto } from './dto/project.dto';
 
 @Injectable()
 export class ProjectService {
@@ -32,7 +33,7 @@ export class ProjectService {
 
     return project;
   }
-  async createProject(data: { name: string; userId: number }) {
+  async createProject(data: ProjectDto) {
     const user = await this.userService.getUserById(data.userId);
     if (!user) {
       throw new BadRequestException('user not found');

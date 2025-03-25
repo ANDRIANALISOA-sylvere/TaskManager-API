@@ -8,6 +8,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
+import { ProjectDto } from './dto/project.dto';
 
 @Controller('projects')
 export class ProjectController {
@@ -19,7 +20,7 @@ export class ProjectController {
   }
 
   @Post()
-  async create(@Body() body: { name: string; userId: number }) {
+  async create(@Body() body: ProjectDto) {
     const project = await this.projectService.createProject(body);
 
     return project;
