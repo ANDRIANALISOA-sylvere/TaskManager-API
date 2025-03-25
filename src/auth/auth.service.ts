@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { IntegerType } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,7 @@ export class AuthService {
     private userService: UserService,
   ) {}
 
-  async register(data: { name: string; email: string; password: string }) {
+  async register(data: RegisterDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: data.email },
     });
