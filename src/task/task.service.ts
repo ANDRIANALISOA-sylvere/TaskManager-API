@@ -33,6 +33,7 @@ export class TaskService {
     title: string;
     description: string;
     priority: string;
+    deadline: string;
     projectId: number;
   }) {
     const project = await this.projectService.getProjectById(data.projectId);
@@ -49,6 +50,7 @@ export class TaskService {
         title: data.title,
         description: data.description,
         priority: data.priority as Priority,
+        deadline: data.deadline,
         Project: {
           connect: {
             id: data.projectId,

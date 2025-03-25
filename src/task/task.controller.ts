@@ -25,6 +25,7 @@ export class TaskController {
       title: string;
       description: string;
       priority: string;
+      deadline: string;
       projectId: number;
     },
   ) {
