@@ -2,16 +2,27 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Priority } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ProjectService } from 'src/project/project.service';
+import { UserService } from 'src/user/user.service';
+import { TaskDto } from './dto/Task.dto';
+import { Status } from 'src/enum/Status.enum';
+import { UpdateStatusDto } from './dto/UpdateStatusDto';
 
 @Injectable()
 export class TaskService {
   constructor(
     private prisma: PrismaService,
     private projectService: ProjectService,
+    private userService: UserService,
   ) {}
 
-  async getAllTasks() {
+  async getAllTasks(email: string) {
+    const user = await this.userService.getUserByEmail(email);
     const tasks = await this.prisma.task.findMany({
+      where: {
+        Project: {
+          userId: user?.id,
+        },
+      },
       include: { Project: true },
     });
 
@@ -29,13 +40,7 @@ export class TaskService {
 
     return task;
   }
-  async createTask(data: {
-    title: string;
-    description: string;
-    priority: string;
-    deadline: string;
-    projectId: number;
-  }) {
+  async createTask(data: TaskDto) {
     const project = await this.projectService.getProjectById(data.projectId);
     if (!project) {
       throw new BadRequestException('project not found');
@@ -77,6 +82,19 @@ export class TaskService {
         title: data.title,
         description: data.description,
         priority: data.priority as Priority,
+      },
+      include: {
+        Project: true,
+      },
+    });
+  }
+
+  async updateStatus(id: number, status: Status) {
+    const task = await this.getTaskById(id);
+    return this.prisma.task.update({
+      where: { id: Number(task.id) },
+      data: {
+        status,
       },
       include: {
         Project: true,

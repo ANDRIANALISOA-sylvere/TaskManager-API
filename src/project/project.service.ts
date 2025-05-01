@@ -11,10 +11,13 @@ export class ProjectService {
     private userService: UserService,
   ) {}
 
-  async getAllProject() {
+  async getAllProjectByUser(email: string) {
+    const user = await this.userService.getUserByEmail(email);
     return this.prisma.project.findMany({
+      where: { userId: user?.id },
       include: {
         User: true,
+        tasks: true,
       },
     });
   }
@@ -24,6 +27,7 @@ export class ProjectService {
       where: { id: Number(id) },
       include: {
         User: true,
+        tasks: true,
       },
     });
 
@@ -33,8 +37,20 @@ export class ProjectService {
 
     return project;
   }
-  async createProject(data: ProjectDto) {
-    const user = await this.userService.getUserById(data.userId);
+
+  async isProjectOwner(projectId: number, userId: number): Promise<boolean> {
+    const project = await this.prisma.project.findUnique({
+      where: { id: Number(projectId) },
+    });
+
+    if (project && project.userId === userId) {
+      return true;
+    }
+
+    return false;
+  }
+  async createProject(data: ProjectDto, email: string) {
+    const user = await this.userService.getUserByEmail(email);
     if (!user) {
       throw new BadRequestException('user not found');
     }
@@ -43,7 +59,7 @@ export class ProjectService {
         name: data.name,
         User: {
           connect: {
-            id: data.userId,
+            id: user.id,
           },
         },
       },
@@ -55,7 +71,7 @@ export class ProjectService {
     return project;
   }
 
-  async updateTask(id: number, data: { name: string }) {
+  async updateTask(id: number, data: ProjectDto) {
     const project = await this.getProjectById(id);
 
     return this.prisma.project.update({
